@@ -6,6 +6,13 @@ import {createTripListTemplate} from './view/trip-list';
 import {createMakeFormTemplate} from './view/make-form';
 import {createEditFormTemplate} from './view/edit-form';
 import {createRoutePointTemplate} from './view/route-point';
+import {generateRoutePoint} from './mock/route-point';
+import {generateFilter} from './mock/filter';
+
+const ROUTE_POINT_COUNTER = 15;
+
+const routePoints = new Array(ROUTE_POINT_COUNTER).fill().map(generateRoutePoint);
+const filters = generateFilter(routePoints);
 
 const render = (container, template, place = 'beforeend') => {
   container.insertAdjacentHTML(place, template);
@@ -20,18 +27,16 @@ const tripEventsContainer = mainEl.querySelector('.trip-events');
 
 render(mainTripNavContainer, createMenuTemplate());
 render(mainTripContainer, createRouteInfoTemplate(), 'afterbegin');
-render(mainTripFiltersContainer, createFiltersTemplate());
+render(mainTripFiltersContainer, createFiltersTemplate(filters));
 render(tripEventsContainer, createSortTemplate());
 render(tripEventsContainer, createTripListTemplate());
 
 const tripList = mainEl.querySelector('.trip-events__list');
-const ROUTE_POINT_COUNTER = 3;
 
-render(tripList, createEditFormTemplate(), 'afterbegin');
-render(tripList, createMakeFormTemplate());
+render(tripList, createMakeFormTemplate(routePoints[0]));
+render(tripList, createEditFormTemplate(routePoints[1]));
 
-for (let i = 0; i < ROUTE_POINT_COUNTER; i++) {
-  render(tripList, createRoutePointTemplate());
+
+for (let i = 2; i < routePoints.length; i++) {
+  render(tripList, createRoutePointTemplate(routePoints[i]));
 }
-
-
