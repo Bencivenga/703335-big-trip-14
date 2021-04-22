@@ -4,10 +4,11 @@ import {
   humanizeStartDateFormat,
   humanizeEndDateFormat,
   humanizeDurationFormat,
-  humanizeDateFormat
+  humanizeDateFormat,
+  createElement
 } from '../util';
 
-export const createRoutePointTemplate = (point) => {
+const createRoutePointTemplate = (point) => {
   const {basicPrice, type, destination, offers, isFavorite, date} = point;
   const favoriteButtonClass = isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -45,4 +46,27 @@ export const createRoutePointTemplate = (point) => {
               </div>
             </li>`;
 };
+
+export default class RoutePoint {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRoutePointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 

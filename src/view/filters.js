@@ -1,3 +1,5 @@
+import {createElement} from '../util';
+
 const createFilterItemTemplate = (filters, isChecked) => {
   const {name, count} = filters;
 
@@ -13,7 +15,7 @@ const createFilterItemTemplate = (filters, isChecked) => {
                 </div>`;
 };
 
-export const createFiltersTemplate = (filterItems) => {
+const createFiltersTemplate = (filterItems) => {
 
   const filtersItemTemplate = filterItems
     .map((filter) => createFilterItemTemplate(filter))
@@ -25,4 +27,27 @@ export const createFiltersTemplate = (filterItems) => {
                 <button class="visually-hidden" type="submit">Accept filter</button>
               </form>`;
 };
+
+export default class Filters {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
