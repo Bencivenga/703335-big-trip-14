@@ -1,6 +1,6 @@
-import {changeDateFormat, createOffers, createDescription} from '../util';
+import {changeDateFormat, createOffers, createDescription, createElement} from '../util';
 
-export const createEditFormTemplate = (point) => {
+const createEditFormTemplate = (point) => {
   const {basicPrice, type, destination, offers, info, date} = point;
 
   const offersSectionClass = (offers.length === 0) ? 'visually-hidden' : '';
@@ -120,3 +120,26 @@ export const createEditFormTemplate = (point) => {
               </form>
             </li>`;
 };
+
+export default class EditForm {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditFormTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

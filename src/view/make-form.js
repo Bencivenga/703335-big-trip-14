@@ -1,6 +1,6 @@
-import {changeDateFormat, createOffers, createDescriptionWithPhoto} from '../util';
+import {changeDateFormat, createOffers, createDescriptionWithPhoto, createElement} from '../util';
 
-export const createMakeFormTemplate = (point) => {
+const createMakeFormTemplate = (point) => {
   const {basicPrice, type, destination, offers, info, date} = point;
 
   const offersSectionClass = (offers.length === 0) ? 'visually-hidden' : '';
@@ -117,4 +117,27 @@ export const createMakeFormTemplate = (point) => {
   </form>
   </li>`;
 };
+
+export default class MakeForm {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMakeFormTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 
