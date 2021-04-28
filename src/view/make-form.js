@@ -1,4 +1,7 @@
-import {changeDateFormat, createOffers, createDescriptionWithPhoto, createElement} from '../util';
+import AbstractView from './abstract';
+import {changeDateFormat} from '../utils/route-point';
+import {createOffers} from '../utils/offers';
+import {createDescriptionWithPhoto} from '../utils/description';
 
 const createMakeFormTemplate = (point) => {
   const {basicPrice, type, destination, offers, info, date} = point;
@@ -118,26 +121,14 @@ const createMakeFormTemplate = (point) => {
   </li>`;
 };
 
-export default class MakeForm {
+export default class MakeForm extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createMakeFormTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

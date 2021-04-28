@@ -9,7 +9,7 @@ import RoutePointView from './view/route-point';
 import NoPointView from './view/no-point';
 import {generateRoutePoint} from './mock/route-point';
 import {generateFilter} from './mock/filter';
-import {render, RenderPosition} from './util';
+import {render, RenderPosition, replace} from './utils/render';
 
 const ROUTE_POINT_COUNTER = 15;
 
@@ -29,11 +29,11 @@ const renderRoutePoint = (container, point) => {
   const routeEditComponent = new EditFormView(point);
 
   const replacePointToForm = () => {
-    container.replaceChild(routeEditComponent.getElement(), routePointComponent.getElement());
+    replace(routeEditComponent, routePointComponent);
   };
 
   const replaceFormToPoint = () => {
-    container.replaceChild(routePointComponent.getElement(), routeEditComponent.getElement());
+    replace(routePointComponent, routeEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -44,38 +44,36 @@ const renderRoutePoint = (container, point) => {
     }
   };
 
-
-  routePointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  routePointComponent.setRollupClickHandler(() => {
     replacePointToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  routeEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  routeEditComponent.setFormSubmitHandler(() => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  render(container, routePointComponent.getElement(), RenderPosition.BEFOREEND);
+  render(container, routePointComponent, RenderPosition.BEFOREEND);
 };
 
 const renderTripList = (container, points) => {
   if (points.length === 0) {
-    render(container, new NoPointView().getElement(), RenderPosition.BEFOREEND);
+    render(container, new NoPointView(), RenderPosition.BEFOREEND);
   } else {
-    render(container, new SortView().getElement(), RenderPosition.BEFOREEND);
-    render(container, tripListComponent.getElement(), RenderPosition.BEFOREEND);
-    render(tripListComponent.getElement(), new MakeFormView(points[0]).getElement(), RenderPosition.BEFOREEND);
-    render(mainTripContainer, new RouteInfoView().getElement(), RenderPosition.AFTERBEGIN);
+    render(container, new SortView(), RenderPosition.BEFOREEND);
+    render(container, tripListComponent, RenderPosition.BEFOREEND);
+    render(tripListComponent, new MakeFormView(points[0]), RenderPosition.BEFOREEND);
+    render(mainTripContainer, new RouteInfoView(), RenderPosition.AFTERBEGIN);
 
     for (let i = 1; i < points.length; i++) {
-      renderRoutePoint(tripListComponent.getElement(), points[i]);
+      renderRoutePoint(tripListComponent, points[i]);
     }
   }
 };
 
-render(mainTripNavContainer, new MenuView().getElement(), RenderPosition.BEFOREEND);
-render(mainTripFiltersContainer, new FiltersView(filters).getElement(), RenderPosition.BEFOREEND);
+render(mainTripNavContainer, new MenuView(), RenderPosition.BEFOREEND);
+render(mainTripFiltersContainer, new FiltersView(filters), RenderPosition.BEFOREEND);
 renderTripList(tripEventsContainer, routePoints);
 
 

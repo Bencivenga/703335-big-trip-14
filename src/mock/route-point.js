@@ -1,11 +1,6 @@
-import {
-  getRandomInteger,
-  getRandomArrayElement,
-  generateDate,
-  generateEndDate,
-  generateDescription,
-  generatePhotos
-} from '../util';
+import {getRandomInteger, getRandomArrayElement} from '../utils/common';
+import {generateDate, generateEndDate} from '../utils/route-point';
+import {generateDescription, generatePhotos} from '../utils/description';
 
 import {
   TYPES,
