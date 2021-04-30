@@ -1,6 +1,4 @@
-import {
-  getRandomArray
-} from './util';
+import {getRandomArray} from './utils/common';
 
 export const TYPES = [
   'Taxi',

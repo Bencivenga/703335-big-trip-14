@@ -1,4 +1,7 @@
-import {changeDateFormat, createOffers, createDescription, createElement} from '../util';
+import AbstractView from './abstract';
+import {changeDateFormat} from '../utils/route-point';
+import {createOffers} from '../utils/offers';
+import {createDescription} from '../utils/description';
 
 const createEditFormTemplate = (point) => {
   const {basicPrice, type, destination, offers, info, date} = point;
@@ -121,25 +124,25 @@ const createEditFormTemplate = (point) => {
             </li>`;
 };
 
-export default class EditForm {
+export default class EditForm extends AbstractView{
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEditFormTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 }

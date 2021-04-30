@@ -1,12 +1,12 @@
+import AbstractView from './abstract';
 import {
-  createPointOffers,
   getDatetimeFormat,
   humanizeStartDateFormat,
   humanizeEndDateFormat,
   humanizeDurationFormat,
-  humanizeDateFormat,
-  createElement
-} from '../util';
+  humanizeDateFormat
+} from '../utils/route-point';
+import {createPointOffers} from '../utils/offers';
 
 const createRoutePointTemplate = (point) => {
   const {basicPrice, type, destination, offers, isFavorite, date} = point;
@@ -47,26 +47,26 @@ const createRoutePointTemplate = (point) => {
             </li>`;
 };
 
-export default class RoutePoint {
+export default class RoutePoint extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createRoutePointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.rollupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 }
 
