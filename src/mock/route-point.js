@@ -1,3 +1,4 @@
+import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomArrayElement} from '../utils/common';
 import {generateDate, generateEndDate} from '../utils/route-point';
 import {generateDescription, generatePhotos} from '../utils/description';
@@ -24,6 +25,7 @@ export const generateRoutePoint = () => {
   const type = getRandomArrayElement(TYPES);
   const startDate = generateDate();
   return {
+    id: nanoid(),
     basicPrice: getRandomInteger(100, 2000),
     destination: getRandomArrayElement(DESTINATIONS),
     type,
