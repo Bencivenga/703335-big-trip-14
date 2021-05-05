@@ -1,6 +1,5 @@
 import TripListView from '../view/trip-list';
 import SortView from '../view/sort';
-import MakeFormView from '../view/make-form';
 import NoPointView from '../view/no-point';
 import RoutePointPresenter from './route-point';
 import {updateItem} from '../utils/common.js';
@@ -42,11 +41,6 @@ export default class TripBoard {
     render(this._tripBoardContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderMakeForm() {
-    this._makeFormComponent = new MakeFormView(this._tripListPoints[0]);
-    render(this._tripListComponent, this._makeFormComponent, RenderPosition.AFTERBEGIN);
-  }
-
   _renderPoint(point) {
     const routePointPresenter = new RoutePointPresenter(this._tripListComponent, this._handlePointChange, this._handleModeChange);
     routePointPresenter.init(point);
@@ -54,9 +48,7 @@ export default class TripBoard {
   }
 
   _renderPoints() {
-    for (let i = 1; i < this._tripListPoints.length; i++) {
-      this._renderPoint(this._tripListPoints[i]);
-    }
+    this._tripListPoints.forEach((point) => this._renderPoint(point));
   }
 
   _renderNoPoints() {
