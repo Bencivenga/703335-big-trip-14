@@ -23,7 +23,6 @@ export default class TripBoard {
     this._tripListPoints = tripListPoints;
 
     this._renderTripBoard();
-    this._renderMakeForm();
   }
 
   _handleModeChange() {
