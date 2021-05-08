@@ -3,25 +3,38 @@ import SortView from '../view/sort';
 import NoPointView from '../view/no-point';
 import RoutePointPresenter from './route-point';
 import {updateItem} from '../utils/common.js';
-import {render, RenderPosition} from '../utils/render';
+import {render, RenderPosition, remove} from '../utils/render';
+import {SortType} from '../data';
+import {sortByDay, sortByPrice, sortByTime} from '../utils/route-point';
 
 
 export default class TripBoard {
   constructor(tripBoardContainer) {
     this._tripBoardContainer = tripBoardContainer;
     this._routePointPresenter = {};
+    this._currentSortType = SortType.DAY;
 
     this._tripListComponent = new TripListView();
-    this._sortComponent = new SortView();
     this._noPointComponet = new NoPointView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handlePointChange = this._handlePointChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(tripListPoints) {
-    this._tripListPoints = tripListPoints;
+    this._tripListPoints = tripListPoints.slice();
 
+    this._renderTripBoard();
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortPoints(sortType);
+    this._clearTripList();
     this._renderTripBoard();
   }
 
@@ -36,8 +49,26 @@ export default class TripBoard {
     this._routePointPresenter[updatedTask.id].init(updatedTask);
   }
 
+  _sortPoints(sortType) {
+    switch(sortType) {
+      case SortType.TIME:
+        this._tripListPoints.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this._tripListPoints.sort(sortByPrice);
+        break;
+      case SortType.DAY:
+      default:
+        this._tripListPoints.sort(sortByDay);
+    }
+
+    this._currentSortType = sortType;
+  }
+
   _renderSort() {
+    this._sortComponent = new SortView(this._currentSortType);
     render(this._tripBoardContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderPoint(point) {
@@ -60,6 +91,7 @@ export default class TripBoard {
       .forEach((presenter) => presenter.destroy());
 
     this._routePointPresenter = {};
+    remove(this._sortComponent);
   }
 
   _renderTripList() {

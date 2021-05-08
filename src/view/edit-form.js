@@ -1,7 +1,7 @@
 import AbstractView from './abstract';
 import {changeDateFormat} from '../utils/route-point';
 import {createOffers} from '../utils/offers';
-import {createDescription} from '../utils/description';
+import {createDescriptionWithPhoto} from '../utils/description';
 
 const createEditFormTemplate = (point) => {
   const {basicPrice, type, destination, offers, info, date} = point;
@@ -118,7 +118,7 @@ const createEditFormTemplate = (point) => {
                       </div>
                     </div>
                   </section>
-                  ${createDescription(info)}
+                  ${createDescriptionWithPhoto(info)}
                 </section>
               </form>
             </li>`;

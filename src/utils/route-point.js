@@ -64,3 +64,13 @@ export const humanizeDurationFormat = (startDate, endDate) => {
 export const isFuturePoint = (point) => dayjs().isAfter(point.startDate, 'D') || dayjs().isSame(point.startDate, 'D');
 
 export const isPastPoint = (point) => dayjs(point.endDate).isBefore(dayjs(), 'D');
+
+export const sortByDay = (pointA, pointB) => dayjs(pointA.date.startDate) - dayjs(pointB.date.startDate);
+
+export const sortByTime = (pointA, pointB) => {
+  const timeA = dayjs(pointA.date.endDate).diff(dayjs(pointA.date.startDate));
+  const timeB = dayjs(pointB.date.endDate).diff(dayjs(pointB.date.startDate));
+  return timeB - timeA;
+};
+
+export const sortByPrice = (pointA, pointB) => pointB.basicPrice - pointA.basicPrice;

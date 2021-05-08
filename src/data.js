@@ -167,3 +167,10 @@ offers
   .set('Transport', getRandomArray(transportOffers))
   .set('Flight', getRandomArray(flightOffers))
   .set('Sightseeing', getRandomArray(sightseeingOffers));
+
+export const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
