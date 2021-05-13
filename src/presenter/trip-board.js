@@ -44,9 +44,9 @@ export default class TripBoard {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handlePointChange(updatedTask) {
-    this._tripListPoints = updateItem(this._tripListPoints, updatedTask);
-    this._routePointPresenter[updatedTask.id].init(updatedTask);
+  _handlePointChange(updatedPoint) {
+    this._tripListPoints = updateItem(this._tripListPoints, updatedPoint);
+    this._routePointPresenter[updatedPoint.id].init(updatedPoint);
   }
 
   _sortPoints(sortType) {

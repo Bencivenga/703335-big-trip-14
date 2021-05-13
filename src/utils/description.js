@@ -20,15 +20,15 @@ export const generateDescription = (array) => {
   return description.slice(0, getRandomInteger(1, 5)).join(' ');
 };
 
-export const createDescriptionWithPhoto = (info) => {
-  return (info === null) ? '' :
+export const createDescriptionWithPhoto = (destination) => {
+  return (destination.info === null) ? '' :
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${info.description}</p>
+      <p class="event__destination-description">${destination.info.description}</p>
 
     <div class="event__photos-container">
     <div class="event__photos-tape">
-    ${createPhotos(info.photo)}
+    ${createPhotos(destination.info.photo)}
   </div>
   </div>
   </section>`;
