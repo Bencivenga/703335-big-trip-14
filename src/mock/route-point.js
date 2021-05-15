@@ -1,25 +1,13 @@
 import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomArrayElement} from '../utils/common';
 import {generateDate, generateEndDate} from '../utils/route-point';
-import {generateDescription, generatePhotos} from '../utils/description';
+import {generateDestination} from './destinations';
 
 import {
   TYPES,
-  DESTINATIONS,
-  DESCRIPTIONS,
-  offers
+  offersMap
 } from '../data';
 
-
-const generateInfo = () => {
-  const isInfo = getRandomInteger(0, 1);
-
-  return (!isInfo) ? null :
-    {
-      description: generateDescription(DESCRIPTIONS),
-      photo: generatePhotos(),
-    };
-};
 
 export const generateRoutePoint = () => {
   const type = getRandomArrayElement(TYPES);
@@ -27,10 +15,9 @@ export const generateRoutePoint = () => {
   return {
     id: nanoid(),
     basicPrice: getRandomInteger(100, 2000),
-    destination: getRandomArrayElement(DESTINATIONS),
+    destination: generateDestination(),
     type,
-    offers: offers.get(type) || [],
-    info: generateInfo(),
+    offers: offersMap.get(type) || [],
     date: {
       startDate,
       endDate: generateEndDate(startDate),

@@ -1,6 +1,7 @@
 import RoutePointView from '../view/route-point';
 import EditFormView from '../view/edit-form';
 import {render, RenderPosition, replace, remove} from '../utils/render';
+import {destinations} from '../mock/destinations';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -21,6 +22,7 @@ export default class RoutePoint {
     this._handleRollupClick = this._handleRollupClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleFormCloseClick = this._handleFormCloseClick.bind(this);
   }
 
   init(point) {
@@ -30,22 +32,23 @@ export default class RoutePoint {
     const prevRoutePointEditComponent = this._routePointEditComponent;
 
     this._routePointComponent = new RoutePointView(point);
-    this._routePointEditComponent = new EditFormView(point);
+    this._routePointEditComponent = new EditFormView(point, destinations);
 
     this._routePointComponent.setRollupClickHandler(this._handleRollupClick);
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._routePointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._routePointEditComponent.setFormCloseClickHandler(this._handleFormCloseClick);
 
     if (prevRoutePointComponent === null || prevRoutePointEditComponent === null) {
       render(this._routePointContainer, this._routePointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
-    if (this._routePointContainer.getElement().contains(prevRoutePointComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._routePointComponent, prevRoutePointComponent);
     }
 
-    if (this._routePointEditComponent.getElement().contains(prevRoutePointEditComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._routePointEditComponent, prevRoutePointEditComponent);
     }
 
@@ -80,6 +83,7 @@ export default class RoutePoint {
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this._routePointEditComponent.reset(this._point);
       this._replaceFormToPoint();
     }
   }
@@ -100,7 +104,13 @@ export default class RoutePoint {
     );
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(point) {
+    this._changeData(point);
+    this._replaceFormToPoint();
+  }
+
+  _handleFormCloseClick() {
+    this._routePointEditComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 }

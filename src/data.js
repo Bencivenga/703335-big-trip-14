@@ -1,16 +1,14 @@
-import {getRandomArray} from './utils/common';
-
 export const TYPES = [
-  'Taxi',
-  'Bus',
-  'Train',
-  'Ship',
-  'Transport',
-  'Drive',
-  'Flight',
-  'Check-in',
-  'Sightseeing',
-  'Restaurant',
+  'taxi',
+  'bus',
+  'train',
+  'ship',
+  'transport',
+  'drive',
+  'flight',
+  'check-in',
+  'sightseeing',
+  'restaurant',
 ];
 
 
@@ -158,15 +156,16 @@ const sightseeingOffers = [
   },
 ];
 
-export const offers = new Map();
-offers
-  .set('Taxi', getRandomArray(taxiOffers))
-  .set('Bus', getRandomArray(busOffers))
-  .set('Train', getRandomArray(trainOffers))
-  .set('Ship', getRandomArray(shipOffers))
-  .set('Transport', getRandomArray(transportOffers))
-  .set('Flight', getRandomArray(flightOffers))
-  .set('Sightseeing', getRandomArray(sightseeingOffers));
+export const offersMap = new Map();
+offersMap
+  .set('taxi', taxiOffers)
+  .set('bus', busOffers)
+  .set('train', trainOffers)
+  .set('ship', shipOffers)
+  .set('transport', transportOffers)
+  .set('flight', flightOffers)
+  .set('sightseeing', sightseeingOffers);
+
 
 export const SortType = {
   DAY: 'day',

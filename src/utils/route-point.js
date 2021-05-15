@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {getRandomInteger} from '../utils/common';
+import {TYPES} from '../data';
+import {capitalizeFirstChar} from './common';
 
 dayjs.extend(duration);
 dayjs.duration(100);
@@ -74,3 +76,19 @@ export const sortByTime = (pointA, pointB) => {
 };
 
 export const sortByPrice = (pointA, pointB) => pointB.basicPrice - pointA.basicPrice;
+
+export const getDestinationsList = (destinations) => {
+  return destinations.map((destination) => {
+    return `<option value="${destination.name}"></option>`;
+  }).join('');
+};
+
+export const createEventsTypeList = (currentType) => {
+  return TYPES
+    .map((type) =>
+      `<div class="event__type-item">
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1" data-type="${type}">${capitalizeFirstChar(type)}</label>
+    </div>`)
+    .join('');
+};
