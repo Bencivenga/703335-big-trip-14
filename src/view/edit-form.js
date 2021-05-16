@@ -4,9 +4,11 @@ import {createDescriptionWithPhoto} from '../utils/description';
 import {isEmptyArray} from '../utils/common';
 import {offersMap} from '../data';
 import SmartView from './smart';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const createEditFormTemplate = (state, destinations) => {
-  const {basicPrice, type, destination, hasOffers, date} = state;
+  const {basicPrice, type, destination, hasOffers, startDate, endDate} = state;
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -38,10 +40,10 @@ const createEditFormTemplate = (state, destinations) => {
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${changeDateFormat(date.startDate)}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${changeDateFormat(startDate)}">
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${changeDateFormat(date.endDate)}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${changeDateFormat(endDate)}">
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -60,7 +62,7 @@ const createEditFormTemplate = (state, destinations) => {
                 </header>
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers ${hasOffers  ? 'visually-hidden' : ''}">Offers</h3>
+                    <h3 class="event__section-title  event__section-title--offers ${hasOffers ? 'visually-hidden' : ''}">Offers</h3>
                     <div class="event__available-offers">
                         ${createOffers(state)}
                       </div>
@@ -77,6 +79,8 @@ export default class EditForm extends SmartView {
     super();
     this._state = EditForm.parsePointToState(point);
     this._destinations = destinations;
+    this._startDatePicker = null;
+    this._endDatePicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
@@ -84,8 +88,50 @@ export default class EditForm extends SmartView {
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
+    this._setStartDatePicker();
+    this._setEndDatePicker();
     this._setInnerHandlers();
+  }
+
+  _setStartDatePicker() {
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
+    }
+
+    this._startDatePicker = flatpickr(
+      this.getElement().querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        time_24hr: true,
+        enableTime: true,
+        defaultDate: new Date(this._state.startDate),
+        maxDate: new Date(this._state.endDate),
+        onChange: this._startDateChangeHandler,
+      },
+    );
+  }
+
+  _setEndDatePicker() {
+    if (this._endDatePicker) {
+      this._endDatePicker.destroy();
+      this._endDatePicker = null;
+    }
+
+    this._endDatePicker = flatpickr(
+      this.getElement().querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        time_24hr: true,
+        enableTime: true,
+        defaultDate: new Date(this._state.endDate),
+        minDate: new Date(this._state.startDate),
+        onChange: this._endDateChangeHandler,
+      },
+    );
   }
 
   getTemplate() {
@@ -94,6 +140,8 @@ export default class EditForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setStartDatePicker();
+    this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseClickHandler(this._callback.closeClick);
   }
@@ -110,6 +158,18 @@ export default class EditForm extends SmartView {
 
     this.getElement().querySelectorAll('.event__offer-checkbox')
       .forEach((item) => item.addEventListener('change', this._offersChangeHandler));
+  }
+
+  _startDateChangeHandler([userDate]) {
+    this.updateState({
+      startDate: userDate,
+    });
+  }
+
+  _endDateChangeHandler([userDate]) {
+    this.updateState({
+      endDate: userDate,
+    });
   }
 
   _typeClickHandler(evt) {

@@ -9,23 +9,23 @@ import {
 import {createPointOffers} from '../utils/offers';
 
 const createRoutePointTemplate = (point) => {
-  const {basicPrice, type, destination, offers, isFavorite, date} = point;
+  const {basicPrice, type, destination, offers, isFavorite, startDate, endDate} = point;
   const favoriteButtonClass = isFavorite ? 'event__favorite-btn--active' : '';
 
   return `<li class="trip-events__item">
               <div class="event">
-                <time class="event__date" datetime="${getDatetimeFormat(date.startDate)}">${humanizeDateFormat(date.startDate)}</time>
+                <time class="event__date" datetime="${getDatetimeFormat(startDate)}">${humanizeDateFormat(startDate)}</time>
                 <div class="event__type">
                   <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
                 </div>
                 <h3 class="event__title">${type} ${destination.name}</h3>
                 <div class="event__schedule">
                   <p class="event__time">
-                    <time class="event__start-time" datetime="${date.startDate}">${humanizeStartDateFormat(date.startDate, date.endDate)}</time>
+                    <time class="event__start-time" datetime="${startDate}">${humanizeStartDateFormat(startDate, endDate)}</time>
                     &mdash;
-                    <time class="event__end-time" datetime="${date.endDate}">${humanizeEndDateFormat(date.startDate, date.endDate)}</time>
+                    <time class="event__end-time" datetime="${endDate}">${humanizeEndDateFormat(startDate, endDate)}</time>
                   </p>
-                  <p class="event__duration">${humanizeDurationFormat(date.startDate, date.endDate)}</p>
+                  <p class="event__duration">${humanizeDurationFormat(startDate, endDate)}</p>
                 </div>
                 <p class="event__price">
                   &euro;&nbsp;<span class="event__price-value">${basicPrice}</span>

@@ -18,10 +18,9 @@ export const generateRoutePoint = () => {
     destination: generateDestination(),
     type,
     offers: offersMap.get(type) || [],
-    date: {
-      startDate,
-      endDate: generateEndDate(startDate),
-    },
+    startDate,
+    endDate: generateEndDate(startDate),
+
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };
