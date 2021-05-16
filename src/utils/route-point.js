@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {getRandomInteger} from '../utils/common';
+import {getRandomInteger, capitalizeFirstChar} from '../utils/common';
 import {TYPES} from '../data';
-import {capitalizeFirstChar} from './common';
 
 dayjs.extend(duration);
 dayjs.duration(100);
@@ -23,7 +22,7 @@ export const getDateDiffFormat = (startDate, endDate) => {
   const date1 = dayjs(startDate);
   const date2 = dayjs(endDate);
 
-  return date2.isAfter(date1, 'day') ? 'MM/D HH:mm' : 'HH:mm';
+  return date2.isAfter(date1, 'day') ? 'D/MM HH:mm' : 'HH:mm';
 };
 
 export const humanizeStartDateFormat = (startDate, endDate) => {
@@ -43,7 +42,7 @@ export const humanizeDateFormat = (data) => {
 };
 
 export const changeDateFormat = (date) => {
-  return dayjs(date).format('YY/MM/DD HH:mm');
+  return dayjs(date).format('DD/MM/YY HH:mm');
 };
 
 export const humanizeDurationFormat = (startDate, endDate) => {
@@ -67,11 +66,11 @@ export const isFuturePoint = (point) => dayjs().isAfter(point.startDate, 'D') ||
 
 export const isPastPoint = (point) => dayjs(point.endDate).isBefore(dayjs(), 'D');
 
-export const sortByDay = (pointA, pointB) => dayjs(pointA.date.startDate) - dayjs(pointB.date.startDate);
+export const sortByDay = (pointA, pointB) => dayjs(pointA.startDate) - dayjs(pointB.startDate);
 
 export const sortByTime = (pointA, pointB) => {
-  const timeA = dayjs(pointA.date.endDate).diff(dayjs(pointA.date.startDate));
-  const timeB = dayjs(pointB.date.endDate).diff(dayjs(pointB.date.startDate));
+  const timeA = dayjs(pointA.endDate).diff(dayjs(pointA.startDate));
+  const timeB = dayjs(pointB.endDate).diff(dayjs(pointB.startDate));
   return timeB - timeA;
 };
 
