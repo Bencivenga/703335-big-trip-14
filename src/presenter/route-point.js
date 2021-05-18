@@ -1,7 +1,8 @@
 import RoutePointView from '../view/route-point';
 import EditFormView from '../view/edit-form';
 import {render, RenderPosition, replace, remove} from '../utils/render';
-import {destinations} from '../mock/destinations';
+import {UpdateType, UserAction} from '../data';
+import {areDatesEqual} from '../utils/route-point';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -23,10 +24,12 @@ export default class RoutePoint {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFormCloseClick = this._handleFormCloseClick.bind(this);
+    this._handleFormDeleteClick = this._handleFormDeleteClick.bind(this);
   }
 
-  init(point) {
+  init(point, destinations) {
     this._point = point;
+    this._point = destinations;
 
     const prevRoutePointComponent = this._routePointComponent;
     const prevRoutePointEditComponent = this._routePointEditComponent;
@@ -38,6 +41,7 @@ export default class RoutePoint {
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._routePointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._routePointEditComponent.setFormCloseClickHandler(this._handleFormCloseClick);
+    this._routePointEditComponent.setFormDeleteClickHandler(this._handleFormDeleteClick);
 
     if (prevRoutePointComponent === null || prevRoutePointEditComponent === null) {
       render(this._routePointContainer, this._routePointComponent, RenderPosition.BEFOREEND);
@@ -94,6 +98,8 @@ export default class RoutePoint {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._point,
@@ -104,13 +110,29 @@ export default class RoutePoint {
     );
   }
 
-  _handleFormSubmit(point) {
-    this._changeData(point);
+  _handleFormSubmit(update) {
+    const isMinorUpdate =
+      !areDatesEqual(this._point.startDate, update.startDate) ||
+      this._point.basicPrice !== update.basicPrice;
+
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
     this._replaceFormToPoint();
   }
 
   _handleFormCloseClick() {
     this._routePointEditComponent.reset(this._point);
     this._replaceFormToPoint();
+  }
+
+  _handleFormDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   }
 }

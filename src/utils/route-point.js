@@ -6,9 +6,9 @@ import {TYPES} from '../data';
 dayjs.extend(duration);
 dayjs.duration(100);
 
-export const generateDate = (start) => {
-  const startTimestamp = Number(dayjs(start));
-  const endTimestamp = Number(dayjs(start).add(6, 'month'));
+export const generateDate = () => {
+  const startTimestamp = Number(dayjs());
+  const endTimestamp = Number(dayjs().add(6, 'month'));
   return dayjs(getRandomInteger(startTimestamp, endTimestamp)).format('YYYY-MM-DDTHH:mm');
 };
 
@@ -62,7 +62,8 @@ export const humanizeDurationFormat = (startDate, endDate) => {
   return `${minutes}M`;
 };
 
-export const isFuturePoint = (point) => dayjs().isAfter(point.startDate, 'D') || dayjs().isSame(point.startDate, 'D');
+export const isFuturePoint = (point) => dayjs(point.startDate).isAfter(dayjs(), 'D') ||
+  dayjs(point.startDate).isSame(dayjs(), 'D');
 
 export const isPastPoint = (point) => dayjs(point.endDate).isBefore(dayjs(), 'D');
 
@@ -90,4 +91,8 @@ export const createEventsTypeList = (currentType) => {
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1" data-type="${type}">${capitalizeFirstChar(type)}</label>
     </div>`)
     .join('');
+};
+
+export const areDatesEqual = (dateA, dateB) => {
+  return (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB);
 };

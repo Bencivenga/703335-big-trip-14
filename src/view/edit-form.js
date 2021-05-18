@@ -5,6 +5,7 @@ import {isEmptyArray} from '../utils/common';
 import {offersMap} from '../data';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
+import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const createEditFormTemplate = (state, destinations) => {
@@ -32,7 +33,7 @@ const createEditFormTemplate = (state, destinations) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
                     <datalist id="destination-list-1">
                       ${getDestinationsList(destinations)}
                     </datalist>
@@ -51,7 +52,7 @@ const createEditFormTemplate = (state, destinations) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basicPrice}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basicPrice))}">
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -90,6 +91,7 @@ export default class EditForm extends SmartView {
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setStartDatePicker();
     this._setEndDatePicker();
@@ -144,6 +146,7 @@ export default class EditForm extends SmartView {
     this._setEndDatePicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseClickHandler(this._callback.closeClick);
+    this.setFormDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setInnerHandlers() {
@@ -252,6 +255,11 @@ export default class EditForm extends SmartView {
     this._callback.closeClick();
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditForm.parseStateToPoint(this._state));
+  }
+
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
@@ -260,6 +268,20 @@ export default class EditForm extends SmartView {
   setFormCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._formCloseClickHandler);
+  }
+
+  setFormDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
   }
 
   reset(point) {
