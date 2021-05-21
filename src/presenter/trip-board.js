@@ -1,6 +1,8 @@
+import TripBoardView from '../view/trip-board';
 import TripListView from '../view/trip-list';
 import SortView from '../view/sort';
 import NoPointView from '../view/no-point';
+import StatsView from '../view/stats';
 import RoutePointNewPresenter from './route-point-new';
 import RoutePointPresenter from './route-point';
 import {render, RenderPosition, remove} from '../utils/render';
@@ -11,6 +13,7 @@ import {sortByDay, sortByPrice, sortByTime} from '../utils/route-point';
 
 export default class TripBoard {
   constructor(tripBoardContainer, routePointsModel, filtersModel, destinationsModel, offersModel) {
+    this._mainContainer = document.querySelector('.page-body__page-main');
     this._tripBoardContainer = tripBoardContainer;
     this._routePointsModel = routePointsModel;
     this._filtersModel = filtersModel;
@@ -20,7 +23,9 @@ export default class TripBoard {
     this._routePointPresenter = {};
     this._currentSortType = SortType.DAY;
 
+    this._statsComponent = null;
     this._sortComponent = null;
+    this._tripBoardComponent = new TripBoardView();
     this._tripListComponent = new TripListView();
     this._noPointComponet = new NoPointView();
 
@@ -29,24 +34,48 @@ export default class TripBoard {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._routePointsModel.addObserver(this._handleModelEvent);
-    this._filtersModel.addObserver(this._handleModelEvent);
-    this._destinationsModel.addObserver(this._handleModelEvent);
-    this._offersModel.addObserver(this>this._handleModelEvent);
-
     this._routePointNewPresenter = new RoutePointNewPresenter(this._tripListComponent, this._handleViewAction, this._destinationsModel);
   }
 
   init() {
-    render(this._tripBoardContainer, this._tripListComponent, RenderPosition.BEFOREEND);
+    render(this._tripBoardContainer, this._tripBoardComponent, RenderPosition.AFTERBEGIN);
+    render(this._tripBoardComponent, this._tripListComponent, RenderPosition.BEFOREEND);
+
+    this._routePointsModel.addObserver(this._handleModelEvent);
+    this._filtersModel.addObserver(this._handleModelEvent);
+    this._destinationsModel.addObserver(this._handleModelEvent);
+    this._offersModel.addObserver(this._handleModelEvent);
 
     this._renderTripBoard();
+
+  }
+
+  destroy() {
+    this._clearTripBoard({resetSortType: true});
+
+    remove(this._tripBoardComponent);
+    remove(this._tripListComponent);
+
+    this._routePointsModel.removeObserver(this._handleModelEvent);
+    this._filtersModel.removeObserver(this._handleModelEvent);
+    this._destinationsModel.removeObserver(this._handleModelEvent);
+    this._offersModel.removeObserver(this._handleModelEvent);
   }
 
   createPoint() {
     this._currentSortType = SortType.DAY;
     this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._routePointNewPresenter.init();
+  }
+
+  _renderStats() {
+
+    if (this._statsComponent !== null) {
+      this._statsComponent = null;
+    }
+
+    this._statsComponent = new StatsView(this._routePointsModel.getPoints());
+    render(this._mainContainer, this._statsComponent, RenderPosition.BEFOREEND);
   }
 
   _getPoints() {
@@ -114,13 +143,13 @@ export default class TripBoard {
 
   _renderSort() {
     this._sortComponent = new SortView(this._currentSortType);
-    render(this._tripBoardContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
+    render(this._tripBoardComponent, this._sortComponent, RenderPosition.AFTERBEGIN);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  _renderPoint(point, destinations) {
-    const routePointPresenter = new RoutePointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange, this._destinations);
-    routePointPresenter.init(point, destinations);
+  _renderPoint(point) {
+    const routePointPresenter = new RoutePointPresenter(this._tripListComponent, this._handleViewAction, this._handleModeChange, this._destinationsModel);
+    routePointPresenter.init(point, this._destinationsModel.getDestinations());
     this._routePointPresenter[point.id] = routePointPresenter;
   }
 
@@ -147,6 +176,8 @@ export default class TripBoard {
     if (resetSortType) {
       this._currentSortType = SortType.DAY;
     }
+
+    this._renderStats();
   }
 
   _renderTripBoard() {
@@ -157,6 +188,7 @@ export default class TripBoard {
 
     this._renderSort();
     this._renderPoints(this._routePointsModel);
+    remove(this._statsComponent);
   }
 
 }

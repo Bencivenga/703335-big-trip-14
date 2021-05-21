@@ -21,7 +21,7 @@ export default class RoutePointNew {
   constructor(pointsContainer, changeData, destinationsModel) {
     this._pointsContainer = pointsContainer;
     this._changeData = changeData;
-    this._destinationsModel = destinationsModel.getDestinations();
+    this._destinationsModel = destinationsModel;
 
     this._routePointNewComponent = null;
 
@@ -36,7 +36,7 @@ export default class RoutePointNew {
       return;
     }
 
-    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel);
+    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel.getDestinations());
     this._routePointNewComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._routePointNewComponent.setFormCloseClickHandler(this._handleFormCloseClick);
     this._routePointNewComponent.setFormDeleteClickHandler(this._handleFormDeleteClick);

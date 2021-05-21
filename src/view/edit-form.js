@@ -7,9 +7,13 @@ import SmartView from './smart';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import {destinations} from '../mock/destinations';
 
-const createEditFormTemplate = (state, destinations) => {
+const destinationsList = destinations;
+
+const createEditFormTemplate = (state) => {
   const {basicPrice, type, destination, hasOffers, startDate, endDate} = state;
+
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -35,7 +39,7 @@ const createEditFormTemplate = (state, destinations) => {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                      ${getDestinationsList(destinations)}
+                      ${getDestinationsList(destinationsList)}
                     </datalist>
                   </div>
 
@@ -52,7 +56,7 @@ const createEditFormTemplate = (state, destinations) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basicPrice))}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basicPrice))}" required>
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

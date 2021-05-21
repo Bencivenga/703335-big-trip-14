@@ -29,7 +29,7 @@ export default class RoutePoint {
 
   init(point, destinations) {
     this._point = point;
-    this._point = destinations;
+    this._destinations = destinations;
 
     const prevRoutePointComponent = this._routePointComponent;
     const prevRoutePointEditComponent = this._routePointEditComponent;
@@ -124,7 +124,7 @@ export default class RoutePoint {
   }
 
   _handleFormCloseClick() {
-    this._routePointEditComponent.reset(this._point);
+    this._routePointEditComponent.reset(this._point, this._destinations);
     this._replaceFormToPoint();
   }
 

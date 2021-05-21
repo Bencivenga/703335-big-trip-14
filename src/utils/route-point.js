@@ -45,8 +45,11 @@ export const changeDateFormat = (date) => {
   return dayjs(date).format('DD/MM/YY HH:mm');
 };
 
-export const humanizeDurationFormat = (startDate, endDate) => {
-  const diff = dayjs(endDate).diff(dayjs(startDate));
+export const getDateDuration = (startDate, endDate) => {
+  return dayjs(endDate).diff(dayjs(startDate));
+};
+
+export const humanizeDurationFormat = (diff) => {
   const days = String(dayjs.duration(diff).days()).padStart(2, '0');
   const hours = String(dayjs.duration(diff).hours()).padStart(2, '0');
   const minutes = String(dayjs.duration(diff).minutes()).padStart(2, '0');
