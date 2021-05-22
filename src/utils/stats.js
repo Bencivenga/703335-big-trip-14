@@ -7,8 +7,14 @@ export const getUniqueTypes = (points) => {
 
 export const getCostsByType = (points, type) => {
   return points
-    .filter((point) => point.type.toUpperCase() === type)
-    .reduce((sum, item) => sum +=  +item.basicPrice, 0);
+    .reduce((sum, point) => {
+
+      if (point.type.toUpperCase() === type) {
+        return sum += Number(point.basicPrice);
+      }
+
+      return sum;
+    }, 0);
 };
 
 export const countPointsByType = (points, type) => {
@@ -17,6 +23,12 @@ export const countPointsByType = (points, type) => {
 
 export const getDurationByType = (points, type) => {
   return points
-    .filter((point) => point.type.toUpperCase() === type)
-    .reduce((total, point) => total + getDateDuration(point.startDate, point.endDate), 0);
+    .reduce((total, point) => {
+
+      if (point.type.toUpperCase() === type) {
+        return total + getDateDuration(point.startDate, point.endDate);
+      }
+
+      return total;
+    }, 0);
 };

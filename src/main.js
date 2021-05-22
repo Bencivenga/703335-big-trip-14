@@ -52,7 +52,6 @@ const handleSiteMenuClick = (menuItem) => {
     case MenuItem.STATS:
       tripBoardPresenter.destroy();
       addNewEventButton.disabled = true;
-      filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       break;
   }
 };
