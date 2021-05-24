@@ -3,6 +3,7 @@ import {
   getDatetimeFormat,
   humanizeStartDateFormat,
   humanizeEndDateFormat,
+  getDateDuration,
   humanizeDurationFormat,
   humanizeDateFormat
 } from '../utils/route-point';
@@ -25,7 +26,7 @@ const createRoutePointTemplate = (point) => {
                     &mdash;
                     <time class="event__end-time" datetime="${endDate}">${humanizeEndDateFormat(startDate, endDate)}</time>
                   </p>
-                  <p class="event__duration">${humanizeDurationFormat(startDate, endDate)}</p>
+                  <p class="event__duration">${humanizeDurationFormat(getDateDuration(startDate, endDate))}</p>
                 </div>
                 <p class="event__price">
                   &euro;&nbsp;<span class="event__price-value">${basicPrice}</span>
