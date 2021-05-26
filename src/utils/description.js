@@ -1,43 +1,17 @@
-import {getRandomInteger, shuffleArray} from '../utils/common';
-
-export const generatePhotos = () => {
-  const array = [];
-  for (let i = 0; i < getRandomInteger(1, 10); i++) {
-    array.push({
-      src: `http://picsum.photos/248/152?r=${i}`,
-    });
-  }
-  return array;
-};
-
-const createPhotos = (photos) => {
-  return photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="Event photo">`).join('');
-};
-
-export const generateDescription = (array) => {
-  const description = array.slice();
-  shuffleArray(description);
-  return description.slice(0, getRandomInteger(1, 5)).join(' ');
+const createPhotos = (destination) => {
+  return destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 };
 
 export const createDescriptionWithPhoto = (destination) => {
-  return (destination.info === null) ? '' :
+  return (destination.description === null) ? '' :
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${destination.info.description}</p>
+      <p class="event__destination-description">${destination.description}</p>
 
     <div class="event__photos-container">
     <div class="event__photos-tape">
-    ${createPhotos(destination.info.photo)}
+    ${createPhotos(destination)}
   </div>
   </div>
-  </section>`;
-};
-
-export const createDescription = (info) => {
-  return (info === null) ? '' :
-    `<section class="event__section  event__section--destination">
-      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${info.description}</p>
   </section>`;
 };

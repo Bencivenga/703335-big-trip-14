@@ -1,22 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {getRandomInteger, capitalizeFirstChar} from '../utils/common';
-import {TYPES} from '../data';
+import {capitalizeFirstChar} from '../utils/common';
 
 dayjs.extend(duration);
 dayjs.duration(100);
-
-export const generateDate = () => {
-  const startTimestamp = Number(dayjs());
-  const endTimestamp = Number(dayjs().add(6, 'month'));
-  return dayjs(getRandomInteger(startTimestamp, endTimestamp)).format('YYYY-MM-DDTHH:mm');
-};
-
-export const generateEndDate = (startDate) => {
-  const minDuration = dayjs(startDate).add(3, 'h');
-  const maxDuration = dayjs(startDate).add(5, 'd');
-  return dayjs(getRandomInteger(minDuration, maxDuration)).format('YYYY-MM-DDTHH:mm');
-};
 
 export const getDateDiffFormat = (startDate, endDate) => {
   const date1 = dayjs(startDate);
@@ -86,8 +73,8 @@ export const getDestinationsList = (destinations) => {
   }).join('');
 };
 
-export const createEventsTypeList = (currentType) => {
-  return TYPES
+export const createEventsTypeList = (availableOffers, currentType) => {
+  return Array.from(availableOffers.keys())
     .map((type) =>
       `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>

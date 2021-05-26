@@ -27,15 +27,16 @@ export default class RoutePoint {
     this._handleFormDeleteClick = this._handleFormDeleteClick.bind(this);
   }
 
-  init(point, destinations) {
+  init(point, destinations, offers) {
     this._point = point;
     this._destinations = destinations;
+    this._offers = offers;
 
     const prevRoutePointComponent = this._routePointComponent;
     const prevRoutePointEditComponent = this._routePointEditComponent;
 
     this._routePointComponent = new RoutePointView(point);
-    this._routePointEditComponent = new EditFormView(point, destinations);
+    this._routePointEditComponent = new EditFormView(point, destinations, offers);
 
     this._routePointComponent.setRollupClickHandler(this._handleRollupClick);
     this._routePointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -124,7 +125,7 @@ export default class RoutePoint {
   }
 
   _handleFormCloseClick() {
-    this._routePointEditComponent.reset(this._point, this._destinations);
+    this._routePointEditComponent.reset(this._point, this._destinations, this._offers);
     this._replaceFormToPoint();
   }
 

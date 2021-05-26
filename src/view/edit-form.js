@@ -2,18 +2,15 @@ import {changeDateFormat, getDestinationsList, createEventsTypeList} from '../ut
 import {createOffers} from '../utils/offers';
 import {createDescriptionWithPhoto} from '../utils/description';
 import {isEmptyArray} from '../utils/common';
-import {offersMap} from '../data';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-import {destinations} from '../mock/destinations';
 
-const destinationsList = destinations;
+const createEditFormTemplate = (state, destinations, availableOffers) => {
+  const {basicPrice, type, destination, offers, startDate, endDate} = state;
 
-const createEditFormTemplate = (state) => {
-  const {basicPrice, type, destination, hasOffers, startDate, endDate} = state;
-
+  const hasOffers = isEmptyArray(availableOffers.get(type));
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -28,7 +25,7 @@ const createEditFormTemplate = (state) => {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${createEventsTypeList(type)}
+                        ${createEventsTypeList(availableOffers, type)}
                       </fieldset>
                     </div>
                   </div>
@@ -39,7 +36,7 @@ const createEditFormTemplate = (state) => {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                      ${getDestinationsList(destinationsList)}
+                      ${getDestinationsList(destinations)}
                     </datalist>
                   </div>
 
@@ -66,10 +63,10 @@ const createEditFormTemplate = (state) => {
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers ${hasOffers ? 'visually-hidden' : ''}">Offers</h3>
+                  <section class="event__section  event__section--offers ${hasOffers ? 'visually-hidden' : ''}">
+                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                     <div class="event__available-offers">
-                        ${createOffers(state)}
+                        ${hasOffers ? '' : createOffers(availableOffers, type, offers)}
                       </div>
                     </div>
                   </section>
@@ -80,10 +77,11 @@ const createEditFormTemplate = (state) => {
 };
 
 export default class EditForm extends SmartView {
-  constructor(point, destinations) {
+  constructor(point, destinations, availableOffers) {
     super();
     this._state = EditForm.parsePointToState(point);
     this._destinations = destinations;
+    this._availableOffers = availableOffers;
     this._startDatePicker = null;
     this._endDatePicker = null;
 
@@ -141,7 +139,7 @@ export default class EditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEditFormTemplate(this._state, this._destinations);
+    return createEditFormTemplate(this._state, this._destinations, this._availableOffers);
   }
 
   restoreHandlers() {
@@ -190,7 +188,7 @@ export default class EditForm extends SmartView {
 
     this.updateState({
       type: targetType,
-      hasOffers: isEmptyArray(offersMap.get(targetType)),
+      hasOffers: isEmptyArray(this._availableOffers.get(targetType)),
       offers: [],
     });
   }
@@ -218,22 +216,22 @@ export default class EditForm extends SmartView {
   _offersChangeHandler(evt) {
     evt.preventDefault();
     const targetOffer = evt.target.dataset.name;
-    const availableOffers = offersMap.get(this._state.type);
+    const availableOffers = this._availableOffers.get(this._state.type);
 
-    const selectedOffer = availableOffers.find((item) => item.name === targetOffer);
-    const changedOffer = this._state.offers.find((item) => item.name === targetOffer);
+    const checkedOffers = availableOffers.find((item) => item.title === targetOffer);
+    const changedOffers = this._state.offers.find((item) => item.title === targetOffer);
 
     this.updateState({
-      offers: changedOffer ?
-        this._state.offers.filter((item) => item.name !== targetOffer) :
-        [...this._state.offers, selectedOffer],
+      offers: changedOffers ?
+        this._state.offers.filter((item) => item.title !== targetOffer) :
+        [...this._state.offers, checkedOffers],
     });
   }
 
   _priceInputHandler(evt) {
     evt.preventDefault();
 
-    const value = evt.target.value;
+    const value = Number(evt.target.value);
 
     if (value < 0 || isNaN(value)) {
       evt.target.setCustomValidity('Must be a positive integer number');
@@ -295,21 +293,10 @@ export default class EditForm extends SmartView {
   }
 
   static parsePointToState(point) {
-
-    return Object.assign(
-      {},
-      point,
-      {
-        hasOffers: isEmptyArray(offersMap.get(point.type)),
-      },
-    );
+    return Object.assign({}, point);
   }
 
   static parseStateToPoint(state) {
-    state = Object.assign({}, state);
-
-    delete state.hasOffers;
-
-    return state;
+    return Object.assign({}, state);
   }
 }
