@@ -6,22 +6,24 @@ import {UserAction, UpdateType} from '../data';
 const BLANK_POINT = {
   basicPrice: '',
   destination: {
+    description: '',
     name: '',
-    info: null,
+    pictures: [],
   },
   type: 'bus',
   offers: [],
-  startDate: new Date,
-  endDate: new Date,
+  startDate: new Date(),
+  endDate: new Date(),
   isFavorite: false,
 };
 
 
 export default class RoutePointNew {
-  constructor(pointsContainer, changeData, destinationsModel) {
+  constructor(pointsContainer, changeData, destinationsModel, offersModel) {
     this._pointsContainer = pointsContainer;
     this._changeData = changeData;
     this._destinationsModel = destinationsModel;
+    this._offersModel = offersModel;
 
     this._routePointNewComponent = null;
 
@@ -36,7 +38,7 @@ export default class RoutePointNew {
       return;
     }
 
-    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel.getDestinations());
+    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel.getDestinations(), this._offersModel.getOffers());
     this._routePointNewComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._routePointNewComponent.setFormCloseClickHandler(this._handleFormCloseClick);
     this._routePointNewComponent.setFormDeleteClickHandler(this._handleFormDeleteClick);

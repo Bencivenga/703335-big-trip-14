@@ -14,7 +14,12 @@ const createRouteInfoTemplate = () => {
           </section>`;
 };
 
-export default class RouteInfo extends AbstractView{
+export default class RouteInfo extends AbstractView {
+  constructor(points) {
+    super();
+    this._points = points;
+  }
+
   getTemplate() {
     return createRouteInfoTemplate();
   }
