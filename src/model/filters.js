@@ -4,7 +4,6 @@ import {FilterType} from '../data';
 export default class Filters extends Observer {
   constructor() {
     super();
-
     this._activeFilter = FilterType.EVERYTHING;
   }
 

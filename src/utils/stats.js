@@ -32,3 +32,22 @@ export const getDurationByType = (points, type) => {
       return total;
     }, 0);
 };
+
+export const getDataMap = (labels, data) => {
+  const dataMap = new Map();
+
+  for (let i = 0; i < labels.length; i++) {
+    dataMap.set(labels[i], data[i]);
+  }
+
+  return dataMap;
+};
+
+export const getMapSorted = (mapToSort) => {
+  const mapSorted = new Map([...mapToSort.entries()]
+    .sort((first, second) => {
+      return second[1] - first[1];
+    }));
+
+  return mapSorted;
+};

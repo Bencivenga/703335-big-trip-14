@@ -1,9 +1,53 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {capitalizeFirstChar} from '../utils/common';
+import {MAX_ROUTE_LIST_TITLE_LENGTH} from '../data';
 
 dayjs.extend(duration);
 dayjs.duration(100);
+
+const getDestinationsFromPoints = (points) => {
+  const destinations = [];
+
+  for (const point of points) {
+    destinations.push(point.destination.name);
+  }
+
+  return destinations;
+};
+
+export const getRoutePointsListTitle = (points) => {
+  const destinations = getDestinationsFromPoints(points);
+
+  if (destinations.length > MAX_ROUTE_LIST_TITLE_LENGTH) {
+    return `${destinations.slice(0, MAX_ROUTE_LIST_TITLE_LENGTH - 2)}
+    —  . . . —  ${destinations.slice([destinations.length - 1])}`;
+  }
+  return destinations.join(' — ');
+};
+
+const calcAllPointsPrice = (points) => points
+  .reduce((acc, point) => acc + point.basicPrice, 0);
+
+const calcAllOffersPrice = (points) => {
+  return points.reduce((pointsAcc, {offers}) => {
+    pointsAcc += offers.reduce((offersAcc, offer) => {
+      return offersAcc + offer.price;
+    }, 0);
+
+    return pointsAcc;
+  }, 0);
+
+};
+
+export const calcTotalPrice = (points) => calcAllPointsPrice(points) + calcAllOffersPrice(points);
+
+export const getRouteDates = (points) => {
+  const firstDate = dayjs(points[0].startDate).format('D MMM');
+  const lastDate = dayjs(points[points.length - 1].endDate).format('D MMM');
+
+  return `${firstDate} — ${lastDate}`;
+};
 
 export const getDateDiffFormat = (startDate, endDate) => {
   const date1 = dayjs(startDate);
@@ -73,11 +117,11 @@ export const getDestinationsList = (destinations) => {
   }).join('');
 };
 
-export const createEventsTypeList = (availableOffers, currentType) => {
+export const createEventsTypeList = (availableOffers, currentType, isDisabled) => {
   return Array.from(availableOffers.keys())
     .map((type) =>
       `<div class="event__type-item">
-      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''}>
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1" data-type="${type}">${capitalizeFirstChar(type)}</label>
     </div>`)
     .join('');

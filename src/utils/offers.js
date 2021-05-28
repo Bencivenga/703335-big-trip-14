@@ -9,7 +9,7 @@ export const createPointOffers = (offers) => {
       </li>`).join('') : '';
 };
 
-export const createOffers = (availableOffers, type, checkedOffers) => {
+export const createOffers = (availableOffers, type, checkedOffers, isDisabled) => {
   const offers = availableOffers.get(type);
 
   return (offers && offers.length !== 0) ? offers.map((offer) => {
@@ -24,7 +24,8 @@ export const createOffers = (availableOffers, type, checkedOffers) => {
                         type="checkbox"
                         name="event-offer-${type}"
                         data-name="${title}"
-                        ${isChecked ? 'checked' : ''}>
+                        ${isChecked ? 'checked' : ''}
+                        ${isDisabled ? 'disabled' : ''}>
                         <label
                         class="event__offer-label"
                         for="event-offer-${type}-${id}">

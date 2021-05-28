@@ -5,7 +5,7 @@ import NoPointView from '../view/no-point';
 import StatsView from '../view/stats';
 import LoadingView from '../view/loading';
 import RoutePointNewPresenter from './route-point-new';
-import RoutePointPresenter from './route-point';
+import RoutePointPresenter, {State as RoutePointPresenterViewState} from './route-point';
 import {render, RenderPosition, remove} from '../utils/render';
 import {filters} from '../utils/filters';
 import {SortType, UpdateType, UserAction, FilterType} from '../data';
@@ -118,21 +118,33 @@ export default class TripBoard {
 
     switch (actionType) {
       case UserAction.UPDATE_POINT:
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.SAVING);
         this._api.updatePoint(update)
           .then((response) => {
             this._routePointsModel.updatePoint(updateType, response);
+          })
+          .catch(() => {
+            this._routePointPresenter.setAborting();
           });
         break;
       case UserAction.ADD_POINT:
+        this._routePointNewPresenter.setSaving();
         this._api.addPoint(update)
           .then((response) => {
             this._routePointsModel.addPoint(updateType, response);
+          })
+          .catch(() => {
+            this._routePointNewPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
           });
         break;
       case UserAction.DELETE_POINT:
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.DELETING);
         this._api.deletePoint(update)
           .then(() => {
             this._routePointsModel.deletePoint(updateType, update);
+          })
+          .catch(() => {
+            this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
           });
         break;
     }
@@ -222,5 +234,4 @@ export default class TripBoard {
     this._renderPoints(this._routePointsModel);
     remove(this._statsComponent);
   }
-
 }

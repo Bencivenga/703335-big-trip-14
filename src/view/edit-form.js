@@ -2,15 +2,18 @@ import {changeDateFormat, getDestinationsList, createEventsTypeList} from '../ut
 import {createOffers} from '../utils/offers';
 import {createDescriptionWithPhoto} from '../utils/description';
 import {isEmptyArray} from '../utils/common';
+import {Mode} from '../data';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
 import he from 'he';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const createEditFormTemplate = (state, destinations, availableOffers) => {
-  const {basicPrice, type, destination, offers, startDate, endDate} = state;
+const createEditFormTemplate = (state, destinations, availableOffers, mode) => {
+  const {basicPrice, type, destination, offers, startDate, endDate, isDisabled, isSaving, isDeleting} = state;
 
   const hasOffers = isEmptyArray(availableOffers.get(type));
+  const hasDescription = isEmptyArray(destination.description);
+  const isAddingMode = mode === Mode.ADDING_NEW;
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -20,12 +23,12 @@ const createEditFormTemplate = (state, destinations, availableOffers) => {
                       <span class="visually-hidden">Choose event type</span>
                       <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
                     </label>
-                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${createEventsTypeList(availableOffers, type)}
+                        ${createEventsTypeList(availableOffers, type, isDisabled)}
                       </fieldset>
                     </div>
                   </div>
@@ -34,7 +37,7 @@ const createEditFormTemplate = (state, destinations, availableOffers) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''} required>
                     <datalist id="destination-list-1">
                       ${getDestinationsList(destinations)}
                     </datalist>
@@ -42,10 +45,10 @@ const createEditFormTemplate = (state, destinations, availableOffers) => {
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${changeDateFormat(startDate)}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${changeDateFormat(startDate)}" ${isDisabled ? 'disabled' : ''}>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${changeDateFormat(endDate)}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${changeDateFormat(endDate)}" ${isDisabled ? 'disabled' : ''}>
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -53,37 +56,39 @@ const createEditFormTemplate = (state, destinations, availableOffers) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basicPrice))}" required>
+                    <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(basicPrice))}" ${isDisabled ? 'disabled' : ''} required>
                   </div>
 
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Delete</button>
+                  <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+                  ${isAddingMode ? '<button class="event__reset-btn" type="reset">Cancel</button>' : `<button class="event__reset-btn" type="reset">${isDeleting ? 'Deleting...' : 'Delete'}</button>`}
+                  
                   <button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers ${hasOffers ? 'visually-hidden' : ''}">
+                  <section class="event__section  event__section--offers ${hasOffers ? '' : 'visually-hidden'}">
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                     <div class="event__available-offers">
-                        ${hasOffers ? '' : createOffers(availableOffers, type, offers)}
+                        ${hasOffers ? createOffers(availableOffers, type, offers, isDisabled) : ''}
                       </div>
                     </div>
                   </section>
-                    ${createDescriptionWithPhoto(destination)}
+                    ${hasDescription ? '' : createDescriptionWithPhoto(destination)}
                 </section>
               </form>
             </li>`;
 };
 
 export default class EditForm extends SmartView {
-  constructor(point, destinations, availableOffers) {
+  constructor(point, destinations, availableOffers, mode) {
     super();
     this._state = EditForm.parsePointToState(point);
     this._destinations = destinations;
     this._availableOffers = availableOffers;
     this._startDatePicker = null;
     this._endDatePicker = null;
+    this._mode = mode;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
@@ -100,6 +105,34 @@ export default class EditForm extends SmartView {
     this._setInnerHandlers();
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
+  getTemplate() {
+    return createEditFormTemplate(this._state, this._destinations, this._availableOffers, this._mode);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setStartDatePicker();
+    this._setEndDatePicker();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormCloseClickHandler(this._callback.closeClick);
+    this.setFormDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  reset(point) {
+    this.updateState(
+      EditForm.parsePointToState(point),
+    );
+  }
+
   _setStartDatePicker() {
     if (this._startDatePicker) {
       this._startDatePicker.destroy();
@@ -113,7 +146,6 @@ export default class EditForm extends SmartView {
         time_24hr: true,
         enableTime: true,
         defaultDate: new Date(this._state.startDate),
-        maxDate: new Date(this._state.endDate),
         onChange: this._startDateChangeHandler,
       },
     );
@@ -136,19 +168,6 @@ export default class EditForm extends SmartView {
         onChange: this._endDateChangeHandler,
       },
     );
-  }
-
-  getTemplate() {
-    return createEditFormTemplate(this._state, this._destinations, this._availableOffers);
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this._setStartDatePicker();
-    this._setEndDatePicker();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormCloseClickHandler(this._callback.closeClick);
-    this.setFormDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setInnerHandlers() {
@@ -277,26 +296,24 @@ export default class EditForm extends SmartView {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
-  removeElement() {
-    super.removeElement();
-
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-  }
-
-  reset(point) {
-    this.updateState(
-      EditForm.parsePointToState(point),
-    );
-  }
-
   static parsePointToState(point) {
-    return Object.assign({}, point);
+    return Object.assign(
+      {},
+      point,
+      {
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
   }
 
   static parseStateToPoint(state) {
-    return Object.assign({}, state);
+    state = Object.assign({}, state);
+
+    delete state.isDisabled;
+    delete  state.isSaving;
+    delete state.isDeleting;
+
+    return state;
   }
 }
