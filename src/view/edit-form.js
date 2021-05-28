@@ -11,7 +11,7 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 const createEditFormTemplate = (state, destinations, availableOffers, mode) => {
   const {basicPrice, type, destination, offers, startDate, endDate, isDisabled, isSaving, isDeleting} = state;
 
-  const hasOffers = isEmptyArray(availableOffers.get(type));
+  const hasOffers = !isEmptyArray(availableOffers.get(type));
   const hasDescription = isEmptyArray(destination.description);
   const isAddingMode = mode === Mode.ADDING_NEW;
 
@@ -67,10 +67,10 @@ const createEditFormTemplate = (state, destinations, availableOffers, mode) => {
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers ${hasOffers ? 'visually-hidden' : '' }">
+                  <section class="event__section  event__section--offers ${hasOffers ? '' : 'visually-hidden' }">
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                     <div class="event__available-offers">
-                        ${hasOffers ? '' : createOffers(availableOffers, type, offers, isDisabled)}
+                        ${hasOffers ? createOffers(availableOffers, type, offers, isDisabled) : ''}
                       </div>
                     </div>
                   </section>
