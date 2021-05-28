@@ -6,18 +6,8 @@ import {MAX_ROUTE_LIST_TITLE_LENGTH} from '../data';
 dayjs.extend(duration);
 dayjs.duration(100);
 
-const getDestinationsFromPoints = (points) => {
-  const destinations = [];
-
-  for (const point of points) {
-    destinations.push(point.destination.name);
-  }
-
-  return destinations;
-};
-
 export const getRoutePointsListTitle = (points) => {
-  const destinations = getDestinationsFromPoints(points);
+  const destinations = points.map((point) => point.destination.name);
 
   if (destinations.length > MAX_ROUTE_LIST_TITLE_LENGTH) {
     return `${destinations.slice(0, MAX_ROUTE_LIST_TITLE_LENGTH - 2)}

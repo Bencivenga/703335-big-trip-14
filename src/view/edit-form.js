@@ -67,14 +67,14 @@ const createEditFormTemplate = (state, destinations, availableOffers, mode) => {
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers ${hasOffers ? '' : 'visually-hidden'}">
+                  <section class="event__section  event__section--offers ${hasOffers ? 'visually-hidden' : '' }">
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                     <div class="event__available-offers">
-                        ${hasOffers ? createOffers(availableOffers, type, offers, isDisabled) : ''}
+                        ${hasOffers ? '' : createOffers(availableOffers, type, offers, isDisabled)}
                       </div>
                     </div>
                   </section>
-                    ${hasDescription ? '' : createDescriptionWithPhoto(destination)}
+                    ${hasDescription ? createDescriptionWithPhoto(destination) : ''}
                 </section>
               </form>
             </li>`;
