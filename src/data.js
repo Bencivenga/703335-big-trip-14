@@ -1,3 +1,11 @@
+export const MAX_ROUTE_LIST_TITLE_LENGTH = 3;
+
+export const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+  ADDING_NEW: 'ADDING_NEW',
+};
+
 export const SortType = {
   DAY: 'day',
   TIME: 'time',
@@ -26,4 +34,10 @@ export const FilterType = {
 export const MenuItem = {
   TABLE: 'Table',
   STATS: 'Stats',
+};
+
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
 };

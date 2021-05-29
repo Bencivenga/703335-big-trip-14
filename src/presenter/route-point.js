@@ -1,13 +1,8 @@
 import RoutePointView from '../view/route-point';
 import EditFormView from '../view/edit-form';
 import {render, RenderPosition, replace, remove} from '../utils/render';
-import {UpdateType, UserAction} from '../data';
+import {UpdateType, UserAction, Mode, State} from '../data';
 import {areDatesEqual} from '../utils/route-point';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
 
 export default class RoutePoint {
   constructor(routePointContainer, changeData, changeMode) {
@@ -54,7 +49,8 @@ export default class RoutePoint {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._routePointEditComponent, prevRoutePointEditComponent);
+      replace(this._routePointComponent, prevRoutePointEditComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevRoutePointComponent);
@@ -69,6 +65,35 @@ export default class RoutePoint {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToPoint();
+    }
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._routePointEditComponent.updateState({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._routePointEditComponent.updateState({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._routePointEditComponent.updateState({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._routePointComponent.shake(resetFormState);
+        this._routePointEditComponent.shake(resetFormState);
+        break;
     }
   }
 
@@ -100,7 +125,7 @@ export default class RoutePoint {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._point,
@@ -121,12 +146,12 @@ export default class RoutePoint {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
-    this._replaceFormToPoint();
   }
 
   _handleFormCloseClick() {
     this._routePointEditComponent.reset(this._point, this._destinations, this._offers);
     this._replaceFormToPoint();
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFormDeleteClick(point) {
@@ -137,3 +162,5 @@ export default class RoutePoint {
     );
   }
 }
+
+export {State};

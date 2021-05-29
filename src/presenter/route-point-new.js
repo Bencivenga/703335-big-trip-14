@@ -1,7 +1,6 @@
 import EditFormView from '../view/edit-form';
-import {nanoid} from 'nanoid';
 import {remove, render, RenderPosition} from '../utils/render';
-import {UserAction, UpdateType} from '../data';
+import {UserAction, UpdateType, Mode} from '../data';
 
 const BLANK_POINT = {
   basicPrice: '',
@@ -24,6 +23,7 @@ export default class RoutePointNew {
     this._changeData = changeData;
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
+    this._mode = Mode.ADDING_NEW;
 
     this._routePointNewComponent = null;
 
@@ -38,7 +38,7 @@ export default class RoutePointNew {
       return;
     }
 
-    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel.getDestinations(), this._offersModel.getOffers());
+    this._routePointNewComponent = new EditFormView(BLANK_POINT, this._destinationsModel.getDestinations(), this._offersModel.getOffers(), this._mode);
     this._routePointNewComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._routePointNewComponent.setFormCloseClickHandler(this._handleFormCloseClick);
     this._routePointNewComponent.setFormDeleteClickHandler(this._handleFormDeleteClick);
@@ -59,14 +59,31 @@ export default class RoutePointNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._routePointNewComponent.updateState({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._routePointNewComponent.updateState({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._routePointNewComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      Object.assign({id: nanoid()}, point),
+      UpdateType.MAJOR,
+      point,
     );
-
-    this.destroy();
   }
 
   _handleFormCloseClick() {

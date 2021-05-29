@@ -1,7 +1,7 @@
 import MenuView from './view/menu';
-import RouteInfoView from './view/route-info';
 import {UpdateType, MenuItem, FilterType} from './data';
 import {render, RenderPosition} from './utils/render';
+import RouteInfoPresenter from './presenter/route-info';
 import FiltersPresenter from './presenter/filters';
 import TripBoardPresenter from './presenter/trip-board';
 import RoutePointsModel from './model/route-points';
@@ -21,37 +21,35 @@ const filtersModel = new FiltersModel();
 const offersModel = new OffersModel();
 
 const siteMainElement = document.querySelector('.page-body__page-main');
-const mainHeader = document.querySelector('.page-header');
-const mainTripContainer = mainHeader.querySelector('.trip-main');
-const mainTripNavContainer = mainTripContainer.querySelector('.trip-controls__navigation');
-const mainTripFiltersContainer = mainTripContainer.querySelector('.trip-controls__filters');
-const addNewEventButton = mainTripContainer.querySelector('.trip-main__event-add-btn');
-const bodyContainer = siteMainElement.querySelector('.page-body__container');
+const mainHeaderElement = document.querySelector('.page-header');
+const mainTripContainerElement = mainHeaderElement.querySelector('.trip-main');
+const mainTripNavContainerElement = mainTripContainerElement.querySelector('.trip-controls__navigation');
+const mainTripFiltersContainerElement = mainTripContainerElement.querySelector('.trip-controls__filters');
+const addNewEventButtonElement = mainTripContainerElement.querySelector('.trip-main__event-add-btn');
+const bodyContainerElement = siteMainElement.querySelector('.page-body__container');
 
 const siteMenuComponent = new MenuView();
 
-const tripBoardPresenter = new TripBoardPresenter(bodyContainer, routePointsModel, filtersModel, destinationsModel, offersModel, api);
-const filtersPresenter = new FiltersPresenter(mainTripFiltersContainer, filtersModel, routePointsModel, offersModel, destinationsModel);
+const routeInfoPresenter =  new RouteInfoPresenter(mainTripContainerElement, routePointsModel);
+const tripBoardPresenter = new TripBoardPresenter(bodyContainerElement, routePointsModel, filtersModel, destinationsModel, offersModel, api);
+const filtersPresenter = new FiltersPresenter(mainTripFiltersContainerElement, filtersModel, routePointsModel, offersModel, destinationsModel);
 
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       tripBoardPresenter.init();
-      addNewEventButton.disabled = false;
+      addNewEventButtonElement.disabled = false;
       filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       break;
     case MenuItem.STATS:
       tripBoardPresenter.destroy();
-      addNewEventButton.disabled = true;
+      addNewEventButtonElement.disabled = true;
       break;
   }
 };
 
-addNewEventButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripBoardPresenter.createPoint();
-});
+addNewEventButtonElement.disabled = true;
 
 Promise.all([
   api.getOffers(),
@@ -62,18 +60,24 @@ Promise.all([
     offersModel.setOffers(offers);
     destinationsModel.setDestinations(destinations);
     routePointsModel.setPoints(UpdateType.INIT, points);
-    render(mainTripContainer, new RouteInfoView(points), RenderPosition.AFTERBEGIN);
-    render(mainTripNavContainer, siteMenuComponent, RenderPosition.BEFOREEND);
+    render(mainTripNavContainerElement, siteMenuComponent, RenderPosition.BEFOREEND);
+    addNewEventButtonElement.disabled = false;
+
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-    filtersPresenter.init();
+    addNewEventButtonElement.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      tripBoardPresenter.createPoint();
+    });
   })
   .catch(() => {
     offersModel.setOffers([]);
     destinationsModel.setDestinations([]);
     routePointsModel.setPoints(UpdateType.INIT, []);
-    render(mainTripNavContainer, siteMenuComponent, RenderPosition.AFTERBEGIN);
+    render(mainTripNavContainerElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
 
-
+routeInfoPresenter.init();
+filtersPresenter.init();
 tripBoardPresenter.init();
+

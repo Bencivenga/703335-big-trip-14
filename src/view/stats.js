@@ -1,7 +1,12 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import SmartView from './smart';
-import {getUniqueTypes, getCostsByType, countPointsByType, getDurationByType} from '../utils/stats';
+import {getUniqueTypes,
+  getCostsByType,
+  countPointsByType,
+  getDurationByType,
+  getDataMap,
+  getMapSorted} from '../utils/stats';
 import {humanizeDurationFormat} from '../utils/route-point';
 
 const BAR_HEIGHT = 55;
@@ -13,13 +18,16 @@ const timeFormat = (val) => `${humanizeDurationFormat(val)}`;
 const renderChart = (ctx, uniqueTypes, data, format, title) => {
   ctx.height = BAR_HEIGHT * uniqueTypes.length;
 
+  const dataMap = getDataMap(uniqueTypes, data);
+  const mapSorted = getMapSorted(dataMap);
+
   return new Chart(ctx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: uniqueTypes,
+      labels: [...mapSorted.keys()],
       datasets: [{
-        data: data,
+        data: [...mapSorted.values()],
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -143,5 +151,4 @@ export default class Stats extends SmartView {
     this._typeChart = renderChart(typeCtx, uniqueTypes, pointsByTypes, typeFormat, 'TYPE');
     this._timeSpentChart = renderChart(timeCtx, uniqueTypes, durationsByTypes, timeFormat, 'TIME-SPEND');
   }
-
 }
