@@ -143,7 +143,7 @@ export default class EditForm extends SmartView {
       this.getElement().querySelector('#event-start-time-1'),
       {
         dateFormat: 'd/m/y H:i',
-        time_24hr: true,
+        ['time_24hr']: true,
         enableTime: true,
         defaultDate: new Date(this._state.startDate),
         onChange: this._startDateChangeHandler,
@@ -161,7 +161,7 @@ export default class EditForm extends SmartView {
       this.getElement().querySelector('#event-end-time-1'),
       {
         dateFormat: 'd/m/y H:i',
-        time_24hr: true,
+        ['time_24hr']: true,
         enableTime: true,
         defaultDate: new Date(this._state.endDate),
         minDate: new Date(this._state.startDate),

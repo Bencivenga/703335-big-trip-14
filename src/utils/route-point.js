@@ -4,7 +4,6 @@ import {capitalizeFirstChar} from '../utils/common';
 import {MAX_ROUTE_LIST_TITLE_LENGTH} from '../data';
 
 dayjs.extend(duration);
-dayjs.duration(100);
 
 export const getRoutePointsListTitle = (points) => {
   const destinations = points.map((point) => point.destination.name);
