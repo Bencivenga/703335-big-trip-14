@@ -12,7 +12,7 @@ const createEditFormTemplate = (state, destinations, availableOffers, mode) => {
   const {basicPrice, type, destination, offers, startDate, endDate, isDisabled, isSaving, isDeleting} = state;
 
   const hasOffers = !isEmptyArray(availableOffers.get(type));
-  const hasDescription = isEmptyArray(destination.description);
+  const hasDescription = Boolean(destination.description);
   const isAddingMode = mode === Mode.ADDING_NEW;
 
   return `<li class="trip-events__item">
