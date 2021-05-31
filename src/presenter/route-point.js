@@ -60,6 +60,7 @@ export default class RoutePoint {
   destroy() {
     remove(this._routePointComponent);
     remove(this._routePointEditComponent);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   resetView() {

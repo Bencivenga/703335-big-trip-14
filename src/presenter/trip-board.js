@@ -2,7 +2,6 @@ import TripBoardView from '../view/trip-board';
 import TripListView from '../view/trip-list';
 import SortView from '../view/sort';
 import NoPointView from '../view/no-point';
-import StatsView from '../view/stats';
 import LoadingView from '../view/loading';
 import RoutePointNewPresenter from './route-point-new';
 import RoutePointPresenter, {State as RoutePointPresenterViewState} from './route-point';
@@ -14,7 +13,6 @@ import {sortByDay, sortByPrice, sortByTime} from '../utils/route-point';
 
 export default class TripBoard {
   constructor(tripBoardContainer, routePointsModel, filtersModel, destinationsModel, offersModel, api) {
-    this._mainContainer = document.querySelector('.page-body__page-main');
     this._tripBoardContainer = tripBoardContainer;
     this._routePointsModel = routePointsModel;
     this._filtersModel = filtersModel;
@@ -72,16 +70,6 @@ export default class TripBoard {
     this._routePointNewPresenter.init();
   }
 
-  _renderStats() {
-
-    if (this._statsComponent !== null) {
-      this._statsComponent = null;
-    }
-
-    this._statsComponent = new StatsView(this._routePointsModel.getPoints());
-    render(this._mainContainer, this._statsComponent, RenderPosition.BEFOREEND);
-  }
-
   _getPoints() {
     const filterType = this._filtersModel.getFilter();
     const points = this._routePointsModel.getPoints();
@@ -124,7 +112,7 @@ export default class TripBoard {
             this._routePointsModel.updatePoint(updateType, response);
           })
           .catch(() => {
-            this._routePointPresenter.setAborting();
+            this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
           });
         break;
       case UserAction.ADD_POINT:
@@ -134,7 +122,7 @@ export default class TripBoard {
             this._routePointsModel.addPoint(updateType, response);
           })
           .catch(() => {
-            this._routePointNewPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
+            this._routePointNewPresenter.setAborting();
           });
         break;
       case UserAction.DELETE_POINT:
@@ -215,8 +203,6 @@ export default class TripBoard {
     if (resetSortType) {
       this._currentSortType = SortType.DAY;
     }
-
-    this._renderStats();
   }
 
   _renderTripBoard() {

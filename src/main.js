@@ -4,6 +4,7 @@ import {render, RenderPosition} from './utils/render';
 import RouteInfoPresenter from './presenter/route-info';
 import FiltersPresenter from './presenter/filters';
 import TripBoardPresenter from './presenter/trip-board';
+import StatsPresenter from './presenter/stats';
 import RoutePointsModel from './model/route-points';
 import DestinationsModel from './model/destinations';
 import OffersModel from './model/offers';
@@ -30,20 +31,23 @@ const bodyContainerElement = siteMainElement.querySelector('.page-body__containe
 
 const siteMenuComponent = new MenuView();
 
-const routeInfoPresenter =  new RouteInfoPresenter(mainTripContainerElement, routePointsModel);
+const routeInfoPresenter = new RouteInfoPresenter(mainTripContainerElement, routePointsModel);
 const tripBoardPresenter = new TripBoardPresenter(bodyContainerElement, routePointsModel, filtersModel, destinationsModel, offersModel, api);
 const filtersPresenter = new FiltersPresenter(mainTripFiltersContainerElement, filtersModel, routePointsModel, offersModel, destinationsModel);
+const statsPresenter = new StatsPresenter(bodyContainerElement, routePointsModel);
 
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
+      statsPresenter.destroy();
       tripBoardPresenter.init();
       addNewEventButtonElement.disabled = false;
       filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       break;
     case MenuItem.STATS:
       tripBoardPresenter.destroy();
+      statsPresenter.init();
       addNewEventButtonElement.disabled = true;
       break;
   }

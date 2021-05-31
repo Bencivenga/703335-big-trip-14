@@ -1,33 +1,30 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import SmartView from './smart';
-import {getUniqueTypes,
+import {
   getCostsByType,
   countPointsByType,
-  getDurationByType,
-  getDataMap,
-  getMapSorted} from '../utils/stats';
+  getDurationsByType,
+  getMapSorted
+} from '../utils/stats';
 import {humanizeDurationFormat} from '../utils/route-point';
 
-const BAR_HEIGHT = 55;
+const BAR_HEIGHT = 85;
 
 const moneyFormat = (val) => `€ ${val}`;
 const typeFormat = (val) => `${val}x`;
 const timeFormat = (val) => `${humanizeDurationFormat(val)}`;
 
-const renderChart = (ctx, uniqueTypes, data, format, title) => {
-  ctx.height = BAR_HEIGHT * uniqueTypes.length;
-
-  const dataMap = getDataMap(uniqueTypes, data);
-  const mapSorted = getMapSorted(dataMap);
+const renderChart = (ctx, data, labels, format, title) => {
+  ctx.height = BAR_HEIGHT * data.length;
 
   return new Chart(ctx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: [...mapSorted.keys()],
+      labels: labels,
       datasets: [{
-        data: [...mapSorted.values()],
+        data: data,
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
@@ -142,13 +139,12 @@ export default class Stats extends SmartView {
     const typeCtx = this.getElement().querySelector('.statistics__chart--transport');
     const timeCtx = this.getElement().querySelector('.statistics__chart--time');
 
-    const uniqueTypes = getUniqueTypes(this._points);
-    const moneyByTypes = uniqueTypes.map((type) => getCostsByType(this._points, type));
-    const pointsByTypes = uniqueTypes.map((type) => countPointsByType(this._points, type));
-    const durationsByTypes = uniqueTypes.map((type) => getDurationByType(this._points, type));
+    const moneyByTypes = getMapSorted(getCostsByType(this._points));
+    const pointsByTypes = getMapSorted(countPointsByType(this._points));
+    const durationsByTypes = getMapSorted(getDurationsByType(this._points));
 
-    this._moneyChart = renderChart(moneyCtx, uniqueTypes, moneyByTypes, moneyFormat, 'MONEY');
-    this._typeChart = renderChart(typeCtx, uniqueTypes, pointsByTypes, typeFormat, 'TYPE');
-    this._timeSpentChart = renderChart(timeCtx, uniqueTypes, durationsByTypes, timeFormat, 'TIME-SPEND');
+    this._moneyChart = renderChart(moneyCtx, [...moneyByTypes.values()], [...moneyByTypes.keys()], moneyFormat, 'MONEY');
+    this._typeChart = renderChart(typeCtx, [...pointsByTypes.values()], [...pointsByTypes.keys()], typeFormat, 'TYPE');
+    this._timeSpentChart = renderChart(timeCtx, [...durationsByTypes.values()], [...durationsByTypes.keys()], timeFormat, 'TIME-SPEND');
   }
 }

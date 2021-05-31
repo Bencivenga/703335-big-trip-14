@@ -1,46 +1,49 @@
-import {getDateDuration} from './route-point';
+export const getCostsByType = (points) => {
+  const CostsByType = new Map();
 
-export const getUniqueTypes = (points) => {
-  const pointTypes = points.map((point) => point.type.toUpperCase());
-  return [...new Set(pointTypes)];
+  points.forEach((point) => {
+    if (CostsByType.has(point.type)) {
+      let moneyByType = CostsByType.get(point.type.toUpperCase());
+      moneyByType = moneyByType + point.basicPrice;
+      CostsByType.set(point.type.toUpperCase(), moneyByType);
+    } else {
+      CostsByType.set(point.type.toUpperCase(), point.basicPrice);
+    }
+  });
+
+  return CostsByType;
 };
 
-export const getCostsByType = (points, type) => {
-  return points
-    .reduce((sum, point) => {
+export const countPointsByType = (points) => {
+  const pointsByType = new Map();
 
-      if (point.type.toUpperCase() === type) {
-        return sum += Number(point.basicPrice);
-      }
+  points.forEach((point) => {
+    if (pointsByType.has(point.type.toUpperCase())) {
+      let countByType = pointsByType.get(point.type.toUpperCase());
+      countByType  = countByType + 1;
+      pointsByType.set(point.type.toUpperCase(), countByType);
+    } else {
+      pointsByType.set(point.type.toUpperCase(), 1);
+    }
+  });
 
-      return sum;
-    }, 0);
+  return pointsByType;
 };
 
-export const countPointsByType = (points, type) => {
-  return points.filter((point) => point.type.toUpperCase() === type).length;
-};
+export const getDurationsByType = (points) => {
+  const durationsByType = new Map();
 
-export const getDurationByType = (points, type) => {
-  return points
-    .reduce((total, point) => {
+  points.forEach((point) => {
+    if (durationsByType.has(point.type)) {
+      let duration = durationsByType.get(point.type.toUpperCase());
+      duration = duration + (point.endDate - point.startDate);
+      durationsByType.set(point.type.toUpperCase(), duration);
+    } else {
+      durationsByType.set(point.type.toUpperCase(), (point.endDate - point.startDate));
+    }
+  });
 
-      if (point.type.toUpperCase() === type) {
-        return total + getDateDuration(point.startDate, point.endDate);
-      }
-
-      return total;
-    }, 0);
-};
-
-export const getDataMap = (labels, data) => {
-  const dataMap = new Map();
-
-  for (let i = 0; i < labels.length; i++) {
-    dataMap.set(labels[i], data[i]);
-  }
-
-  return dataMap;
+  return durationsByType;
 };
 
 export const getMapSorted = (mapToSort) => {

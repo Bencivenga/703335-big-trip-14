@@ -1,5 +1,12 @@
 export const MAX_ROUTE_LIST_TITLE_LENGTH = 3;
 
+export const TimeFormats = {
+  MILLISECONDS_PER_MINUTE: 60000,
+  MINUTES_PER_HOUR: 60,
+  HOURS_PER_DAY: 24,
+  MILLISECONDS_PER_SECOND: 1000,
+};
+
 export const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
@@ -41,3 +48,4 @@ export const State = {
   DELETING: 'DELETING',
   ABORTING: 'ABORTING',
 };
+
