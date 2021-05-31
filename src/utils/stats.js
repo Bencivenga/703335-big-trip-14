@@ -1,17 +1,17 @@
 export const getCostsByType = (points) => {
-  const CostsByType = new Map();
+  const costsByType = new Map();
 
   points.forEach((point) => {
-    if (CostsByType.has(point.type)) {
-      let moneyByType = CostsByType.get(point.type.toUpperCase());
-      moneyByType = moneyByType + point.basicPrice;
-      CostsByType.set(point.type.toUpperCase(), moneyByType);
+    if (costsByType.has(point.type.toUpperCase())) {
+      let moneyByType = costsByType.get(point.type.toUpperCase());
+      moneyByType += point.basicPrice;
+      costsByType.set(point.type.toUpperCase(), moneyByType);
     } else {
-      CostsByType.set(point.type.toUpperCase(), point.basicPrice);
+      costsByType.set(point.type.toUpperCase(), point.basicPrice);
     }
   });
 
-  return CostsByType;
+  return costsByType;
 };
 
 export const countPointsByType = (points) => {
@@ -20,7 +20,7 @@ export const countPointsByType = (points) => {
   points.forEach((point) => {
     if (pointsByType.has(point.type.toUpperCase())) {
       let countByType = pointsByType.get(point.type.toUpperCase());
-      countByType  = countByType + 1;
+      countByType += 1;
       pointsByType.set(point.type.toUpperCase(), countByType);
     } else {
       pointsByType.set(point.type.toUpperCase(), 1);
@@ -34,9 +34,9 @@ export const getDurationsByType = (points) => {
   const durationsByType = new Map();
 
   points.forEach((point) => {
-    if (durationsByType.has(point.type)) {
+    if (durationsByType.has(point.type.toUpperCase())) {
       let duration = durationsByType.get(point.type.toUpperCase());
-      duration = duration + (point.endDate - point.startDate);
+      duration += (point.endDate - point.startDate);
       durationsByType.set(point.type.toUpperCase(), duration);
     } else {
       durationsByType.set(point.type.toUpperCase(), (point.endDate - point.startDate));
